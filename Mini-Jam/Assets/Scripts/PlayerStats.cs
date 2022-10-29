@@ -36,7 +36,7 @@ namespace MiniJam
             ConsumeBlood(Time.deltaTime * m_BloodConsumptionMultiplier);
             
             m_HealthSlider.value = CurrentHealth;
-            m_BloodSlider.value = CurrentBlood;
+            m_BloodSlider.value = CurrentBlood;=
         }
 
         public bool ConsumeBlood(float amount)
