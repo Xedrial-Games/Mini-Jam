@@ -17,32 +17,34 @@ namespace MiniJam
             m_Motor = GetComponent<PlayerMotor>();
             m_Combat = GetComponent<PlayerCombat>();
 
-            InputSystem.Player.Enable();
+            InputSystem.InputSystem.Player.Enable();
 
-            InputSystem.Player.Jump.performed += m_Motor.OnJump;
-            InputSystem.Player.Jump.performed += m_Motor.OnWallJump;
-            InputSystem.Player.Jump.canceled += m_Motor.OnJumpStop;
+            InputSystem.InputSystem.Player.Jump.performed += m_Motor.OnJump;
+            InputSystem.InputSystem.Player.Jump.performed += m_Motor.OnWallJump;
+            InputSystem.InputSystem.Player.Jump.canceled += m_Motor.OnJumpStop;
 
-            InputSystem.Player.Dash.performed += m_Motor.OnDash;
+            InputSystem.InputSystem.Player.Dash.performed += m_Motor.OnDash;
 
-            InputSystem.Player.Attack.performed += m_Combat.SetAttack;
+            var weapon = GetComponent<Weapon>();
+            if (weapon)
+                InputSystem.InputSystem.Player.Attack.performed += weapon.Shoot;
         }
 
         private void OnDestroy()
         {
-            InputSystem.Player.Jump.performed -= m_Motor.OnJump;
-            InputSystem.Player.Jump.performed -= m_Motor.OnWallJump;
-            InputSystem.Player.Jump.canceled -= m_Motor.OnJumpStop;
+            InputSystem.InputSystem.Player.Jump.performed -= m_Motor.OnJump;
+            InputSystem.InputSystem.Player.Jump.performed -= m_Motor.OnWallJump;
+            InputSystem.InputSystem.Player.Jump.canceled -= m_Motor.OnJumpStop;
 
-            InputSystem.Player.Dash.performed -= m_Motor.OnDash;
+            InputSystem.InputSystem.Player.Dash.performed -= m_Motor.OnDash;
 
-            InputSystem.Player.Attack.performed -= m_Combat.SetAttack;
+            InputSystem.InputSystem.Player.Attack.performed -= m_Combat.SetAttack;
         }
 
         private void Update()
         {
-            m_Move = InputSystem.Player.Move.ReadValue<float>();
-            m_MoveY = InputSystem.Player.MoveY.ReadValue<float>();
+            m_Move = InputSystem.InputSystem.Player.Move.ReadValue<float>();
+            m_MoveY = InputSystem.InputSystem.Player.MoveY.ReadValue<float>();
         }
 
         private void FixedUpdate()

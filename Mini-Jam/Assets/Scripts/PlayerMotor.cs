@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -232,7 +233,7 @@ namespace MiniJam
 
         private void Dash()
         {
-            m_Rigidbody.AddForce(transform.right * m_DashForce * Time.fixedDeltaTime, ForceMode2D.Impulse);
+            m_Rigidbody.AddForce(m_DashForce * Time.fixedDeltaTime * transform.right, ForceMode2D.Impulse);
         }
 
         private IEnumerator StopDash()

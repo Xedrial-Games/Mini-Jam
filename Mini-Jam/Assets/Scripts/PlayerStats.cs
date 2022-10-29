@@ -6,6 +6,9 @@ namespace MiniJam
 {
     public class PlayerStats : MonoBehaviour
     {
+        public float CurrentHealth { get; private set; }
+        public float CurrentBlood { get; private set; }
+        
         [SerializeField] private int m_MaxHealth = 100;
         [SerializeField] private int m_MaxBlood = 100;
         [SerializeField] private float m_BloodConsumptionMultiplier = 2f;
@@ -15,14 +18,11 @@ namespace MiniJam
         
         [SerializeField] private Slider m_HealthSlider;
         [SerializeField] private Slider m_BloodSlider;
-        
-        private float m_CurrentHealth;
-        private float m_CurrentBlood;
 
         private void Start()
         {
-            m_CurrentHealth = m_MaxHealth;
-            m_CurrentBlood = m_MaxBlood;
+            CurrentHealth = m_MaxHealth;
+            CurrentBlood = m_MaxBlood;
 
             m_HealthSlider.maxValue = m_MaxHealth;
             m_HealthRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, m_MaxHealth);
@@ -35,21 +35,23 @@ namespace MiniJam
         {
             ConsumeBlood(Time.deltaTime * m_BloodConsumptionMultiplier);
             
-            m_HealthSlider.value = m_CurrentHealth;
-            m_BloodSlider.value = m_CurrentBlood;
+            m_HealthSlider.value = CurrentHealth;
+            m_BloodSlider.value = CurrentBlood;
         }
 
-        public void ConsumeBlood(float amount)
+        public bool ConsumeBlood(float amount)
         {
-            m_CurrentBlood -= amount;
-            if (m_CurrentBlood <= 0)
-                Die();
+            if (CurrentBlood < amount)
+                return false;
+            
+            CurrentBlood -= amount;
+            return true;
         }
 
         public void TakeDamage(int amount)
         {
-            m_CurrentHealth -= amount;
-            if (m_CurrentHealth <= 0)
+            CurrentHealth -= amount;
+            if (CurrentHealth <= 0)
                 Die();
         }
 

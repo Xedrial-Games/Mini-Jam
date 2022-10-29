@@ -13,7 +13,7 @@ namespace MiniJam
                 Instance = this;
             else Destroy(gameObject);
             
-            InputSystem.Init();
+            InputSystem.InputSystem.Init();
         }
     }
 }

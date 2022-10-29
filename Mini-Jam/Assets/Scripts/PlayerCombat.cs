@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -11,16 +12,16 @@ namespace MiniJam
     {
         public float MoveY { get; set; }
 
-        [HideInInspector] public bool IsAttacking { get { return m_NextAttackTime > Time.time; } }
+        public bool IsAttacking => m_NextAttackTime > Time.time;
 
         [SerializeField] private LayerMask m_EnemiesLayer;
         [SerializeField] private Attack[] m_ComboAttacks;
 
         private PlayerMotor m_Motor;
 
-        private float m_NextAttackTime = 0.0f;
-        private float m_AttackExitTime = 0.0f;
-        private int m_CurrentAttackIndex = 0;
+        private float m_NextAttackTime;
+        private float m_AttackExitTime;
+        private int m_CurrentAttackIndex;
 
         private void Start()
         {
@@ -38,33 +39,36 @@ namespace MiniJam
             }
         }
 
-        public void SetAttack(InputAction.CallbackContext context)
+        public void SetAttack(InputAction.CallbackContext _)
         {
-            if (Time.time > m_NextAttackTime)
+            if (m_ComboAttacks.Length == 0)
+                return;
+
+            if (!(Time.time > m_NextAttackTime))
+                return;
+            
+            Attack attack = m_ComboAttacks[m_CurrentAttackIndex];
+
+            m_AttackExitTime = attack.AttackAnimation.length + 0.1f;
+            m_NextAttackTime = Time.time + attack.AttackAnimation.length - 0.1f;
+
+            Quaternion rotation;
+            Vector3 position;
+            if (Mathf.Abs(MoveY) > 0.5f)
             {
-                Attack attack = m_ComboAttacks[m_CurrentAttackIndex];
-
-                m_AttackExitTime = attack.AttackAnimation.length + 0.1f;
-                m_NextAttackTime = Time.time + attack.AttackAnimation.length - 0.1f;
-
-                Quaternion rotation;
-                Vector3 position;
-                if (Mathf.Abs(MoveY) > 0.5f)
-                {
-                    rotation = MoveY > 0.01f ? Quaternion.Euler(0.0f, 0.0f, 90f) : Quaternion.Euler(0.0f, 0.0f, 270f);
-                    position = attack.VAttackPoint.position;
-                }
-                else
-                {
-                    rotation = m_Motor.FacingRight ? Quaternion.identity : Quaternion.Euler(0.0f, 180f, 0.0f);
-                    position = attack.AttackPoint.position;
-                }
-
-                Destroy(Instantiate(attack.AttackPrefab, position, rotation), m_AttackExitTime);
-
-                m_Motor.OnAttack(MoveY, attack.AttackForce);
-                PerformAttack();
+                rotation = MoveY > 0.01f ? Quaternion.Euler(0.0f, 0.0f, 90f) : Quaternion.Euler(0.0f, 0.0f, 270f);
+                position = attack.VAttackPoint.position;
             }
+            else
+            {
+                rotation = m_Motor.FacingRight ? Quaternion.identity : Quaternion.Euler(0.0f, 180f, 0.0f);
+                position = attack.AttackPoint.position;
+            }
+
+            Destroy(Instantiate(attack.AttackPrefab, position, rotation), m_AttackExitTime);
+
+            m_Motor.OnAttack(MoveY, attack.AttackForce);
+            PerformAttack();
         }
 
         public void PerformAttack()
@@ -117,6 +121,7 @@ namespace MiniJam
     }
 
     [Serializable]
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
     public class Attack
     {
         public AnimationClip AttackAnimation;
