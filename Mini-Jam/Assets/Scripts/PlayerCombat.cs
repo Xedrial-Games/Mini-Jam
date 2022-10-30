@@ -1,6 +1,6 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
-
+using GMTKGJ;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -71,6 +71,7 @@ namespace MiniJam
             if (attack.AttackPrefab)
                 Destroy(Instantiate(attack.AttackPrefab, position, rotation), m_AttackExitTime);
             
+            AudioManager.PlaySound("SwordSwing");
             m_Animator.SetTrigger(s_Attack);
         }
 

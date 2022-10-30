@@ -20,6 +20,8 @@ namespace MiniJam
         [Space]
         [SerializeField] private Slider m_BloodSlider;
         [SerializeField] private RectTransform m_BloodRect;
+
+        private bool m_Intense;
         
         private float m_CurrentHealth;
         private float m_CurrentBlood;
@@ -42,6 +44,12 @@ namespace MiniJam
             
             m_HealthSlider.value = m_CurrentHealth;
             m_BloodSlider.value = m_CurrentBlood;
+
+            if (m_CurrentHealth > m_MaxHealth / 4f && m_CurrentBlood < m_MaxBlood - m_MaxBlood / 4f && m_Intense)
+            {
+                MusicManager.StopMusic("IntenseLayer");
+                m_Intense = false;
+            }
         }
 
         public bool ConsumeBlood(float amount)
@@ -50,6 +58,13 @@ namespace MiniJam
                 return false;
             
             m_CurrentBlood -= amount;
+            
+            if ((m_CurrentHealth < m_MaxHealth / 4f || m_CurrentBlood >= m_MaxBlood - m_MaxBlood / 4f) && !m_Intense)
+            {
+                MusicManager.UpdateMusic("IntenseLayer");
+                m_Intense = true;
+            }
+
             return true;
         }
 

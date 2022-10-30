@@ -1,5 +1,5 @@
 using System.Collections;
-
+using GMTKGJ;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Serialization;
@@ -9,6 +9,12 @@ namespace MiniJam
     [RequireComponent(typeof(Rigidbody2D))]
     public class PlayerMotor : MonoBehaviour
     {
+        private static readonly int s_Speed = Animator.StringToHash("Speed");
+        private static readonly int s_VSpeed = Animator.StringToHash("vSpeed");
+        private static readonly int s_IsGrounded = Animator.StringToHash("IsGrounded");
+        private static readonly int s_IsDashing = Animator.StringToHash("IsDashing");
+        private static readonly int s_IsTouchingWall = Animator.StringToHash("IsTouchingWall");
+        
         public bool FacingRight { get; private set; } = true;
 
         [Header("Movement")]
@@ -79,10 +85,6 @@ namespace MiniJam
         private Rigidbody2D m_Rigidbody;
         private Animator m_Animator;
         private PlayerCombat m_PlayerCombat;
-        private static readonly int s_Speed = Animator.StringToHash("Speed");
-        private static readonly int s_VSpeed = Animator.StringToHash("vSpeed");
-        private static readonly int s_IsGrounded = Animator.StringToHash("IsGrounded");
-        private static readonly int s_IsDashing = Animator.StringToHash("IsDashing");
 
         private void Awake()
         {
@@ -179,6 +181,7 @@ namespace MiniJam
         public void OnJump(InputAction.CallbackContext context)
         {
             m_LastJumpTime = m_JumpBufferTime;
+            AudioManager.PlaySound("Yamp");
         }
 
         private void Jump()
@@ -236,6 +239,7 @@ namespace MiniJam
             m_IsDashTime = false;
             m_Rigidbody.gravityScale = 0;
             m_Rigidbody.velocity = Vector2.zero;
+            AudioManager.PlaySound("Dash");
             
             StartCoroutine(StopDash());
         }
@@ -273,6 +277,7 @@ namespace MiniJam
             m_Animator.SetFloat(s_VSpeed, m_Rigidbody.velocity.y);
             m_Animator.SetBool(s_IsGrounded, m_IsGrounded);
             m_Animator.SetBool(s_IsDashing, m_IsDashing);
+            m_Animator.SetBool(s_IsTouchingWall, m_IsTouchingWall);
         }
 
         private void Flip()

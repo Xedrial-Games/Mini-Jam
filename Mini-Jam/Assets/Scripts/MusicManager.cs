@@ -1,7 +1,8 @@
 using System;
+using GMTKGJ;
 using UnityEngine;
 
-namespace GMTKGJ
+namespace MiniJam
 {
     public class MusicManager : Singelton<MusicManager>
     {
@@ -10,8 +11,6 @@ namespace GMTKGJ
         private Sound m_BaseSound;
         private Sound m_CurSound;
         private float m_Volume;
-
-        private bool m_Stop;
 
         private void Awake()
         {
@@ -27,7 +26,6 @@ namespace GMTKGJ
 
         public static void UpdateMusic(string musicName)
         {
-            Instance.m_Stop = false;
             Instance.m_CurSound = AudioManager.PlaySound(musicName, Instance.m_BaseSound.Source.time);
             Instance.m_Volume = Instance.m_CurSound.Source.volume;
             Instance.m_CurSound.Source.volume = 0.0f;
@@ -35,7 +33,6 @@ namespace GMTKGJ
 
         public static void StopMusic(string musicName)
         {
-            Instance.m_Stop = true;
             AudioManager.StopSound(musicName);
             Instance.m_CurSound = null;
         }
