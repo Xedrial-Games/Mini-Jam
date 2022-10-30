@@ -8,14 +8,16 @@ namespace MiniJam
     {
         private PlayerMotor m_Motor;
         private PlayerCombat m_Combat;
+        private Weapon m_Weapon;
 
-        private float m_Move = 0.0f;
-        private float m_MoveY = 0.0f;
+        private float m_Move;
+        private float m_MoveY;
 
         private void Awake()
         {
             m_Motor = GetComponent<PlayerMotor>();
             m_Combat = GetComponent<PlayerCombat>();
+            m_Weapon = GetComponent<Weapon>();
 
             InputSystem.InputSystem.Player.Enable();
 
@@ -25,9 +27,7 @@ namespace MiniJam
 
             InputSystem.InputSystem.Player.Dash.performed += m_Motor.OnDash;
 
-            var weapon = GetComponent<Weapon>();
-            if (weapon)
-                InputSystem.InputSystem.Player.Attack.performed += weapon.Shoot;
+            InputSystem.InputSystem.Player.Attack.performed += m_Weapon.Shoot;
         }
 
         private void OnDestroy()
@@ -38,13 +38,15 @@ namespace MiniJam
 
             InputSystem.InputSystem.Player.Dash.performed -= m_Motor.OnDash;
 
-            InputSystem.InputSystem.Player.Attack.performed -= m_Combat.SetAttack;
+            InputSystem.InputSystem.Player.Attack.performed -= m_Weapon.Shoot;
         }
 
         private void Update()
         {
             m_Move = InputSystem.InputSystem.Player.Move.ReadValue<float>();
             m_MoveY = InputSystem.InputSystem.Player.MoveY.ReadValue<float>();
+            
+            m_Motor.Animate(m_Move);
         }
 
         private void FixedUpdate()

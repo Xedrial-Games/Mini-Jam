@@ -1,5 +1,5 @@
-using System;
 using System.Collections;
+
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Serialization;
@@ -9,26 +9,26 @@ namespace MiniJam
     [RequireComponent(typeof(Rigidbody2D))]
     public class PlayerMotor : MonoBehaviour
     {
-        public bool FacingRight { get { return m_FacingRight; } }
+        public bool FacingRight { get; private set; } = true;
 
         [Header("Movement")]
         [SerializeField] private float m_MoveSpeed = 10f;
         [SerializeField] private float m_Acceleration = 7f;
-        [FormerlySerializedAs("m_Decceleration")] [SerializeField] private float m_Deceleration = 7f;
+        [SerializeField] private float m_Deceleration = 7f;
         [SerializeField] private float m_VelocityPower = 0.9f;
 
-        [Space()]
+        [Space]
         [SerializeField] private float m_FrictionAmount = 0.2f;
 
         [Header("Jump")]
         [SerializeField] private float m_JumpForce = 80.0f;
         [SerializeField] private float m_JumpCutMultiplier = 0.5f;
 
-        [Space()]
+        [Space]
         [SerializeField] private float m_JumpCoyoteTime = 0.1f;
         [SerializeField] private float m_JumpBufferTime = 0.1f;
 
-        [Space()]
+        [Space]
         [SerializeField] private float m_GravityScale = 1f;
         [SerializeField] private float m_FallGravityMultiplier = 2f;
 
@@ -47,39 +47,41 @@ namespace MiniJam
         [SerializeField] private Vector2 m_GroundCheckSize = new Vector2(0.5f, 0.02f);
         [SerializeField] private LayerMask m_GroundLayer;
 
-        [Space()]
+        [Space]
         [SerializeField] private Transform m_WallCheck;
         [SerializeField] private float m_WallCheckRadius = 0.3f;
         [SerializeField] private LayerMask m_WallLayer;
 
         // Jump
-        private bool m_IsJumping = false;
-        private float m_LastJumpTime = 0.0f;
-        private bool m_JumpInputReleased = false;
+        private bool m_IsJumping;
+        private float m_LastJumpTime;
+        private bool m_JumpInputReleased;
 
         // Wall Jump
-        private bool m_WallJumping = false;
+        private bool m_WallJumping;
 
         // Dash
-        private bool m_IsDashing = false;
+        private bool m_IsDashing;
         private bool m_CanDash = true;
-        private bool m_IsDashTime = false;
+        private bool m_IsDashTime;
 
         // Ground Check
-        private bool m_IsGrounded = false;
-        private bool m_WasGrounded = false;
-        private float m_LastGroundedTime = 0.0f;
+        private bool m_IsGrounded;
+        private bool m_WasGrounded;
+        private float m_LastGroundedTime;
 
         // Wall Check
-        private bool m_IsTouchingWall = false;
-        private bool m_IsSliding = false;
+        private bool m_IsTouchingWall;
+        private bool m_IsSliding;
 
         // Flip
-        private bool m_FacingRight = true;
 
         private Rigidbody2D m_Rigidbody;
         private Animator m_Animator;
         private PlayerCombat m_PlayerCombat;
+        private static readonly int s_Speed = Animator.StringToHash("Speed");
+        private static readonly int s_VSpeed = Animator.StringToHash("vSpeed");
+        private static readonly int s_IsGrounded = Animator.StringToHash("IsGrounded");
 
         private void Awake()
         {
@@ -113,7 +115,7 @@ namespace MiniJam
             if (!m_IsDashing && !m_PlayerCombat.IsAttacking)
                 m_Rigidbody.AddForce(movement * Vector2.right);
 
-            // Firction
+            // Friction
             if (Mathf.Abs(move) > 0.01f)
             {
                 float amount = Mathf.Min(Mathf.Abs(m_Rigidbody.velocity.x), Mathf.Abs(m_FrictionAmount));
@@ -158,11 +160,16 @@ namespace MiniJam
                 else m_Rigidbody.gravityScale = m_GravityScale;
             }
 
-            // Fliping the player
-            if (!m_PlayerCombat.IsAttacking)
+            // Flipping the player
+            if (m_PlayerCombat.IsAttacking)
+                return;
+            
+            switch (FacingRight)
             {
-                if (m_FacingRight && move < 0.0f) Flip();
-                else if (!m_FacingRight && move > 0.0f) Flip();
+                case true when move < 0.0f:
+                case false when move > 0.0f:
+                    Flip();
+                    break;
             }
         }
 
@@ -197,16 +204,16 @@ namespace MiniJam
 
         public void OnWallJump(InputAction.CallbackContext context)
         {
-            if (m_IsSliding)
-            {
-                m_WallJumping = true;
-                Invoke("OnWallJumpStop", m_WallJumpTime);
-            }
+            if (!m_IsSliding) 
+                return;
+            
+            m_WallJumping = true;
+            Invoke(nameof(OnWallJumpStop), m_WallJumpTime);
         }
 
         private void WallJump()
         {
-            m_Rigidbody.velocity = new Vector2(m_WallForce.x * (m_FacingRight ? -1 : 1), m_WallForce.y);
+            m_Rigidbody.velocity = new Vector2(m_WallForce.x * (FacingRight ? -1 : 1), m_WallForce.y);
         }
 
         private void OnWallJumpStop()
@@ -220,15 +227,16 @@ namespace MiniJam
 
         public void OnDash(InputAction.CallbackContext context)
         {
-            if (!m_IsDashing && m_CanDash)
-            {
-                m_IsDashing = true;
-                m_CanDash = false;
-                m_IsDashTime = false;
-                m_Rigidbody.gravityScale = 0;
-                m_Rigidbody.velocity = Vector2.zero;
-                StartCoroutine(StopDash());
-            }
+            if (m_IsDashing || !m_CanDash)
+                return;
+            
+            m_IsDashing = true;
+            m_CanDash = false;
+            m_IsDashTime = false;
+            m_Rigidbody.gravityScale = 0;
+            m_Rigidbody.velocity = Vector2.zero;
+            
+            StartCoroutine(StopDash());
         }
 
         private void Dash()
@@ -260,15 +268,15 @@ namespace MiniJam
 
         public void Animate(float move)
         {
-            m_Animator.SetFloat("Speed", Mathf.Abs(move));
-            m_Animator.SetFloat("vSpeed", m_Rigidbody.velocity.y);
-            m_Animator.SetBool("IsGrounded", m_IsGrounded);
+            m_Animator.SetFloat(s_Speed, Mathf.Abs(move));
+            m_Animator.SetFloat(s_VSpeed, m_Rigidbody.velocity.y);
+            m_Animator.SetBool(s_IsGrounded, m_IsGrounded);
         }
 
         private void Flip()
         {
             transform.rotation = transform.eulerAngles.y == 0.0f ? Quaternion.Euler(0.0f, 180.0f, 0.0f) : Quaternion.Euler(0.0f, 0.0f, 0.0f);
-            m_FacingRight = !m_FacingRight;
+            FacingRight = !FacingRight;
         }
     }
 }
