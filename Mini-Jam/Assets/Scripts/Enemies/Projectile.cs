@@ -5,6 +5,7 @@ namespace MiniJam.Enemies
     public class Projectile : MonoBehaviour
     {
         [SerializeField] private float m_Speed = 200f;
+        [SerializeField] private int m_Damage = 10;
 
         private Rigidbody2D m_Rigidbody;
 
@@ -18,6 +19,7 @@ namespace MiniJam.Enemies
 
         private void OnTriggerEnter2D(Collider2D collision)
         {
+            collision.GetComponent<PlayerStats>()?.TakeDamage(m_Damage);
             Destroy(gameObject);
         }
     }

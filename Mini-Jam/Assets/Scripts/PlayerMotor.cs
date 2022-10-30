@@ -82,6 +82,7 @@ namespace MiniJam
         private static readonly int s_Speed = Animator.StringToHash("Speed");
         private static readonly int s_VSpeed = Animator.StringToHash("vSpeed");
         private static readonly int s_IsGrounded = Animator.StringToHash("IsGrounded");
+        private static readonly int s_IsDashing = Animator.StringToHash("IsDashing");
 
         private void Awake()
         {
@@ -271,6 +272,7 @@ namespace MiniJam
             m_Animator.SetFloat(s_Speed, Mathf.Abs(move));
             m_Animator.SetFloat(s_VSpeed, m_Rigidbody.velocity.y);
             m_Animator.SetBool(s_IsGrounded, m_IsGrounded);
+            m_Animator.SetBool(s_IsDashing, m_IsDashing);
         }
 
         private void Flip()

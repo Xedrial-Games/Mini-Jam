@@ -5,7 +5,8 @@ namespace MiniJam.Enemies
 {
     public class EnemyAI : MonoBehaviour
     {
-        public bool ReachedEndOfPath { get { return m_ReachedEndOfPath; } }
+        public bool ReachedEndOfPath { get; private set; }
+        public bool Update { get; set; } = true;
 
         [SerializeField] private Transform[] m_Targets;
         [SerializeField] private Transform m_Center;
@@ -18,7 +19,6 @@ namespace MiniJam.Enemies
 
         private Path m_Path;
         private int m_CurrentWaypoint;
-        private bool m_ReachedEndOfPath;
         private int m_LastIndex;
 
         private Seeker m_Seeker;
@@ -40,7 +40,7 @@ namespace MiniJam.Enemies
             if (m_Targets.Length == 0)
                 return;
 
-            if (m_Seeker.IsDone())
+            if (m_Seeker.IsDone() && Update)
                 m_Seeker.StartPath(m_Rigidbody.position, (Vector3)GetRandomPoint() + m_Center.position, OnPathComplete);
         }
 
@@ -64,10 +64,11 @@ namespace MiniJam.Enemies
 
             if (m_CurrentWaypoint >= m_Path.vectorPath.Count)
             {
-                m_ReachedEndOfPath = true;
+                ReachedEndOfPath = true;
                 return;
             }
-            else m_ReachedEndOfPath = false;
+
+            ReachedEndOfPath = false;
 
             Vector2 direction = ((Vector2)m_Path.vectorPath[m_CurrentWaypoint] - m_Rigidbody.position).normalized;
             Vector2 force = m_Speed * Time.fixedDeltaTime * direction;
@@ -94,11 +95,6 @@ namespace MiniJam.Enemies
             m_LastIndex = randomIndex;
 
             return m_Targets[randomIndex].position;
-        }
-
-        public void Hello()
-        {
-            Debug.Log("YES");
         }
 
         private Vector2 GetRandomPoint()

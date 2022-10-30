@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace MiniJam
@@ -18,7 +19,10 @@ namespace MiniJam
             m_Motor = GetComponent<PlayerMotor>();
             m_Combat = GetComponent<PlayerCombat>();
             m_Weapon = GetComponent<Weapon>();
+        }
 
+        private void OnEnable()
+        {
             InputSystem.InputSystem.Player.Enable();
 
             InputSystem.InputSystem.Player.Jump.performed += m_Motor.OnJump;
@@ -27,10 +31,11 @@ namespace MiniJam
 
             InputSystem.InputSystem.Player.Dash.performed += m_Motor.OnDash;
 
-            InputSystem.InputSystem.Player.Attack.performed += m_Weapon.Shoot;
+            InputSystem.InputSystem.Player.Attack.performed += m_Combat.SetAttack;
+            InputSystem.InputSystem.Player.Shoot.performed += m_Weapon.Shoot;
         }
 
-        private void OnDestroy()
+        private void OnDisable()
         {
             InputSystem.InputSystem.Player.Jump.performed -= m_Motor.OnJump;
             InputSystem.InputSystem.Player.Jump.performed -= m_Motor.OnWallJump;
@@ -38,7 +43,8 @@ namespace MiniJam
 
             InputSystem.InputSystem.Player.Dash.performed -= m_Motor.OnDash;
 
-            InputSystem.InputSystem.Player.Attack.performed -= m_Weapon.Shoot;
+            InputSystem.InputSystem.Player.Attack.performed -= m_Combat.SetAttack;
+            InputSystem.InputSystem.Player.Shoot.performed -= m_Weapon.Shoot;
         }
 
         private void Update()

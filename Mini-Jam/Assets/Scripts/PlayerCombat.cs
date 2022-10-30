@@ -18,13 +18,16 @@ namespace MiniJam
         [SerializeField] private Attack[] m_ComboAttacks;
 
         private PlayerMotor m_Motor;
+        private Animator m_Animator;
 
         private float m_NextAttackTime;
         private float m_AttackExitTime;
         private int m_CurrentAttackIndex;
+        private static readonly int s_Attack = Animator.StringToHash("Attack");
 
         private void Start()
         {
+            m_Animator = GetComponentInChildren<Animator>();
             m_Motor = GetComponentInChildren<PlayerMotor>();
         }
 
@@ -65,10 +68,10 @@ namespace MiniJam
                 position = attack.AttackPoint.position;
             }
 
-            Destroy(Instantiate(attack.AttackPrefab, position, rotation), m_AttackExitTime);
-
-            m_Motor.OnAttack(MoveY, attack.AttackForce);
-            PerformAttack();
+            if (attack.AttackPrefab)
+                Destroy(Instantiate(attack.AttackPrefab, position, rotation), m_AttackExitTime);
+            
+            m_Animator.SetTrigger(s_Attack);
         }
 
         public void PerformAttack()
@@ -114,6 +117,9 @@ namespace MiniJam
                 Gizmos.DrawWireSphere(m_ComboAttacks[m_CurrentAttackIndex].DamagePoint.position,
                     m_ComboAttacks[m_CurrentAttackIndex].AttackRadius);
 
+                if (!t.VDamagePoint)
+                    continue;
+                
                 Gizmos.DrawWireSphere(m_ComboAttacks[m_CurrentAttackIndex].VDamagePoint.position,
                     m_ComboAttacks[m_CurrentAttackIndex].AttackRadius);
             }

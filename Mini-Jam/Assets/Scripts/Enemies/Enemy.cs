@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -39,13 +40,14 @@ namespace MiniJam.Enemies
 
                 yield return new WaitForSeconds(0.1f);
 
+                // ReSharper disable once Unity.InefficientPropertyAccess
                 m_SpriteRenderer.color = Color.white;
             }
         }
 
         public void Flip()
         {
-            if (m_Player.position.x > transform.position.x && transform.eulerAngles.y == 180.0f)
+            if (m_Player.position.x > transform.position.x && Math.Abs(transform.eulerAngles.y - 180.0f) < 0)
                 transform.eulerAngles = new Vector3(0.0f, 0.0f, 0.0f);
             else if (m_Player.position.x < transform.position.x && transform.eulerAngles.y == 0.0f)
                 transform.eulerAngles = new Vector3(0.0f, 180.0f, 0.0f);

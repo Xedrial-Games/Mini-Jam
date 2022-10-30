@@ -6,23 +6,28 @@ namespace MiniJam
 {
     public class PlayerStats : MonoBehaviour
     {
-        public float CurrentHealth { get; private set; }
-        public float CurrentBlood { get; private set; }
-        
+        [Header("Health")]
         [SerializeField] private int m_MaxHealth = 100;
+
+        [Space]
+        [SerializeField] private Slider m_HealthSlider;
+        [SerializeField] private RectTransform m_HealthRect;
+
+        [Header("Blood")]
         [SerializeField] private int m_MaxBlood = 100;
         [SerializeField] private float m_BloodConsumptionMultiplier = 2f;
-
-        [SerializeField] private RectTransform m_HealthRect;
+        
+        [Space]
+        [SerializeField] private Slider m_BloodSlider;
         [SerializeField] private RectTransform m_BloodRect;
         
-        [SerializeField] private Slider m_HealthSlider;
-        [SerializeField] private Slider m_BloodSlider;
+        private float m_CurrentHealth;
+        private float m_CurrentBlood;
 
         private void Start()
         {
-            CurrentHealth = m_MaxHealth;
-            CurrentBlood = m_MaxBlood;
+            m_CurrentHealth = m_MaxHealth;
+            m_CurrentBlood = m_MaxBlood;
 
             m_HealthSlider.maxValue = m_MaxHealth;
             m_HealthRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, m_MaxHealth);
@@ -35,29 +40,35 @@ namespace MiniJam
         {
             ConsumeBlood(Time.deltaTime * m_BloodConsumptionMultiplier);
             
-            m_HealthSlider.value = CurrentHealth;
-            m_BloodSlider.value = CurrentBlood;
+            m_HealthSlider.value = m_CurrentHealth;
+            m_BloodSlider.value = m_CurrentBlood;
         }
 
         public bool ConsumeBlood(float amount)
         {
-            if (CurrentBlood < amount)
+            if (m_CurrentBlood < amount)
                 return false;
             
-            CurrentBlood -= amount;
+            m_CurrentBlood -= amount;
             return true;
         }
 
         public void TakeDamage(int amount)
         {
-            CurrentHealth -= amount;
-            if (CurrentHealth <= 0)
+            m_CurrentHealth -= amount;
+            if (m_CurrentHealth <= 0)
                 Die();
         }
 
         private void Die()
         {
-            Destroy(gameObject);
+            foreach (Collider2D col in GetComponents<Collider2D>())
+            {
+                col.enabled = false;
+            }
+
+            GetComponent<PlayerController>().enabled = false;
+            GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Static;
         }
     }
 }
