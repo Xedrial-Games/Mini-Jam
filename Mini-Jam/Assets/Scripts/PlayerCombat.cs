@@ -24,6 +24,7 @@ namespace MiniJam
         private float m_AttackExitTime;
         private int m_CurrentAttackIndex;
         private static readonly int s_Attack = Animator.StringToHash("Attack");
+        private static readonly int s_VAttack = Animator.StringToHash("vAttack");
 
         private void Start()
         {
@@ -61,18 +62,19 @@ namespace MiniJam
             {
                 rotation = MoveY > 0.01f ? Quaternion.Euler(0.0f, 0.0f, 90f) : Quaternion.Euler(0.0f, 0.0f, 270f);
                 position = attack.VAttackPoint.position;
+                m_Animator.SetTrigger(s_VAttack);
             }
             else
             {
                 rotation = m_Motor.FacingRight ? Quaternion.identity : Quaternion.Euler(0.0f, 180f, 0.0f);
                 position = attack.AttackPoint.position;
+                m_Animator.SetTrigger(s_Attack);
             }
 
             if (attack.AttackPrefab)
                 Destroy(Instantiate(attack.AttackPrefab, position, rotation), m_AttackExitTime);
             
             AudioManager.PlaySound("SwordSwing");
-            m_Animator.SetTrigger(s_Attack);
         }
 
         public void PerformAttack()
@@ -96,7 +98,12 @@ namespace MiniJam
                 Collider2D[] enemies = Physics2D.OverlapCircleAll(pos, attack.AttackRadius, m_EnemiesLayer);
 
                 foreach (Collider2D eCollider in enemies)
+                {
                     eCollider.GetComponent<Enemy>()?.TakeDamage(40, direction);
+                    var death = eCollider.GetComponent<DeathProjectile>();
+                    if (death)
+                        Destroy(death.gameObject);
+                }
             }
 
             m_CurrentAttackIndex++;

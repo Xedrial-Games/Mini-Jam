@@ -52,7 +52,7 @@ namespace MiniJam
             m_Move = InputSystem.InputSystem.Player.Move.ReadValue<float>();
             m_MoveY = InputSystem.InputSystem.Player.MoveY.ReadValue<float>();
             
-            m_Motor.Animate(m_Move);
+            m_Motor.Animate(m_Move, m_MoveY);
         }
 
         private void FixedUpdate()

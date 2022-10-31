@@ -29,7 +29,6 @@ namespace MiniJam
         private void Start()
         {
             m_CurrentHealth = m_MaxHealth;
-            m_CurrentBlood = m_MaxBlood;
 
             m_HealthSlider.maxValue = m_MaxHealth;
             m_HealthRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, m_MaxHealth);

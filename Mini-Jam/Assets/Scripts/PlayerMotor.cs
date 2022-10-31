@@ -85,6 +85,7 @@ namespace MiniJam
         private Rigidbody2D m_Rigidbody;
         private Animator m_Animator;
         private PlayerCombat m_PlayerCombat;
+        private static readonly int s_YSpeed = Animator.StringToHash("ySpeed");
 
         private void Awake()
         {
@@ -271,9 +272,10 @@ namespace MiniJam
             else m_Rigidbody.AddForce(attackForce * Mathf.Sign(moveY) * -transform.up, ForceMode2D.Impulse);
         }
 
-        public void Animate(float move)
+        public void Animate(float move, float moveY)
         {
             m_Animator.SetFloat(s_Speed, Mathf.Abs(move));
+            m_Animator.SetFloat(s_YSpeed, moveY);
             m_Animator.SetFloat(s_VSpeed, m_Rigidbody.velocity.y);
             m_Animator.SetBool(s_IsGrounded, m_IsGrounded);
             m_Animator.SetBool(s_IsDashing, m_IsDashing);

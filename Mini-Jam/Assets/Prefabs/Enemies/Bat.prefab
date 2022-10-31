@@ -19,7 +19,7 @@ GameObject:
   - component: {fileID: 4673372587846571261}
   m_Layer: 6
   m_Name: Bat
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -193,6 +193,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Projectile: {fileID: 6163258293828741622, guid: c6af3e8fe2f38ce4c92f7d2aa688d70f, type: 3}
+  m_DeathProjectile: {fileID: 6163258293828741622, guid: 20ddd7bbfc186804fbeaa40e07f03065, type: 3}
   m_Target: {fileID: 0}
   m_Attacks: 2
   m_AttackRate: 1

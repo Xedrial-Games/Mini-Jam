@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace MiniJam.Enemies
@@ -5,6 +6,7 @@ namespace MiniJam.Enemies
     public class EnemyAttack : MonoBehaviour
     {
         [SerializeField] private GameObject m_Projectile;
+        [SerializeField] private GameObject m_DeathProjectile;
         [SerializeField] private Transform m_Target;
         [SerializeField] private int m_Attacks = 4;
         [SerializeField] private float m_AttackRate = 4.0f;
@@ -22,6 +24,9 @@ namespace MiniJam.Enemies
         {
             m_EnemyAI = GetComponent<EnemyAI>();
             m_Animator = GetComponent<Animator>();
+
+            if (!m_Target)
+                m_Target = GameObject.FindGameObjectWithTag("Player").transform;
         }
 
         private void Update()
@@ -56,6 +61,15 @@ namespace MiniJam.Enemies
             float angle = Mathf.Atan2(direction.x, direction.y) * Mathf.Rad2Deg;
             Instantiate(m_Projectile, position, Quaternion.Euler(new Vector3(0f, 0f, -angle - m_Offset)));
             m_AttackIndex++;
+        }
+
+        private void OnDestroy()
+        {
+            Vector3 position = transform.position;
+            
+            Vector3 direction = (position - m_Target.position).normalized;
+            float angle = Mathf.Atan2(direction.x, direction.y) * Mathf.Rad2Deg;
+            Instantiate(m_DeathProjectile, position, Quaternion.Euler(new Vector3(0f, 0f, -angle - m_Offset)));
         }
     }
 }

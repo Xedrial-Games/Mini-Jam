@@ -26,8 +26,11 @@ namespace MiniJam.Enemies
 
         private void Start()
         {
-            if (m_Targets.Length == 0)
-                Debug.LogError("No targets specified");
+            if (m_Targets.Length == 0 || m_Center == null)
+            {
+                m_Targets = new[] { GameObject.FindGameObjectWithTag("Player").transform };
+                m_Center = m_Targets[0];
+            }
 
             m_Seeker = GetComponent<Seeker>();
             m_Rigidbody = GetComponent<Rigidbody2D>();
