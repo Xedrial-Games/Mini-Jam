@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace MiniJam
@@ -83,6 +84,8 @@ namespace MiniJam
 
             GetComponent<PlayerController>().enabled = false;
             GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Static;
+
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
     }
 }
